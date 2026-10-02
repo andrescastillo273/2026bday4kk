@@ -92,11 +92,18 @@ with col2:
 # Logic for Button 1 (Full message + Horoscope)
 if full_vibes:
     try:
-        img_url = get_rotating_image()
-        st.image(img_url, use_column_width=True)
+        # Create invisible containers to lock in the layout order
+        text_container = st.container()
+        image_container = st.container()
         
-        st.write_stream(stream_affirmation_and_horoscope())
-        st.balloons()
+        # Load the image instantly into the BOTTOM container
+        img_url = get_rotating_image()
+        image_container.image(img_url, use_column_width=True)
+        
+        # Stream the text into the TOP container
+        with text_container:
+            st.write_stream(stream_affirmation_and_horoscope())
+            
     except Exception as e:
         # Catch-all for ANY error during the streaming process
         if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
@@ -107,10 +114,18 @@ if full_vibes:
 # Logic for Button 2 (Short 1-2 sentences)
 if quick_vibes:
     try:
-        img_url = get_rotating_image()
-        st.image(img_url, use_column_width=True)
+        # Create invisible containers to lock in the layout order
+        text_container = st.container()
+        image_container = st.container()
         
-        st.write_stream(stream_short_affirmation())
+        # Load the image instantly into the BOTTOM container
+        img_url = get_rotating_image()
+        image_container.image(img_url, use_column_width=True)
+        
+        # Stream the text into the TOP container
+        with text_container:
+            st.write_stream(stream_short_affirmation())
+            
     except Exception as e:
         # Catch-all for ANY error during the streaming process
         if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
