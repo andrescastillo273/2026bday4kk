@@ -58,10 +58,26 @@ def get_short_affirmation():
     return response.text
 
 def get_rotating_image():
-    themes = ['dog', 'cat', 'horse', 'beach', 'mountains', 'rainfall']
-    choice = random.choice(themes)
-    cache_buster = random.randint(1, 10000)
-    return f"https://loremflickr.com/800/600/{choice}?random={cache_buster}"
+    # A curated, fail-proof list of high-quality Unsplash images
+    images = [
+        # Dogs 
+        "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=800&q=80", 
+        # Cats
+        "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=800&q=80",
+        # Horses
+        "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1598974357801-cb86b72946c1?auto=format&fit=crop&w=800&q=80",
+        # Broad Nature (Woods, Cabins, Beaches, Mountains, Rainfall)
+        "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80", # Woods
+        "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=800&q=80", # Cabin
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", # Beach
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80", # Mountain
+        "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=800&q=80"  # Rainfall
+    ]
+    return random.choice(images)
 
 # --- UI Design ---
 st.title("✨ A Little Positivity for Kate ✨")
