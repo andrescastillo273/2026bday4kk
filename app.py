@@ -19,7 +19,7 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 # We will set this up in Streamlit Cloud later
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
 except KeyError:
     st.error("API Key not found. Please set GEMINI_API_KEY in Streamlit Secrets.")
 
