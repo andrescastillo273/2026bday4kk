@@ -23,7 +23,7 @@ try:
 except KeyError:
     st.error("API Key not found. Please set GEMINI_API_KEY in Streamlit Secrets.")
 
-def get_affirmation_and_horoscope():
+def stream_affirmation_and_horoscope():
     prompt = """
     Write a short, unique, and highly personalized positive affirmation for my girlfriend, Kate. 
     She is 26, a USPTO attorney, a former college soccer player, a hopeless romantic, a left-leaning Republican, and fiercely loyal. 
@@ -44,38 +44,42 @@ def get_affirmation_and_horoscope():
     ### ♎ Today's Libra Horoscope
     [Your horoscope here]
     """
-    response = model.generate_content(prompt)
-    return response.text
+    # stream=True tells Google to send the words as they are being typed
+    response = model.generate_content(prompt, stream=True)
+    for chunk in response:
+        yield chunk.text
 
-def get_short_affirmation():
+def stream_short_affirmation():
     prompt = """
     Write a very short, punchy 1 to 2 sentence maximum positive affirmation for my girlfriend, Kate. 
     She is an incredibly hardworking 26-year-old USPTO attorney who manages anxiety and ADHD. 
     Make it a quick, empowering pick-me-up that reminds her she is deeply loved and totally capable.
-    Do not include a horoscope or any extra text.
+    Do not include a horoscope or any extra text. Do not use line breaks.
     """
-    response = model.generate_content(prompt)
-    return response.text
+    # stream=True tells Google to send the words as they are being typed
+    response = model.generate_content(prompt, stream=True)
+    
+    # We yield the Markdown header formatting first so the font stays large
+    yield "### 💛 " 
+    for chunk in response:
+        # Strip out any sneaky line breaks as they arrive to protect the font size
+        yield chunk.text.replace("\n", " ")
 
 def get_rotating_image():
     # A curated, fail-proof list of high-quality Unsplash images
     images = [
-        # Dogs 
         "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=800&q=80", 
-        # Cats
         "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=800&q=80",
-        # Horses
         "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1598974357801-cb86b72946c1?auto=format&fit=crop&w=800&q=80",
-        # Broad Nature (Woods, Cabins, Beaches, Mountains, Rainfall)
-        "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80", # Woods
-        "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=800&q=80", # Cabin
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", # Beach
-        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80", # Mountain
-        "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=800&q=80"  # Rainfall
+        "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80", 
+        "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=800&q=80", 
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", 
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80", 
+        "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=800&q=80"  
     ]
     return random.choice(images)
 
@@ -93,26 +97,25 @@ with col2:
 
 # Logic for Button 1 (Full message + Horoscope)
 if full_vibes:
-    with st.spinner("Gathering love, horoscopes, and good vibes..."):
-        try:
-            message = get_affirmation_and_horoscope()
-            img_url = get_rotating_image()
-            
-            st.markdown(message)
-            st.image(img_url, use_column_width=True)
-            st.balloons()
-        except ResourceExhausted:
-            st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
+    try:
+        # Show the image instantly so she isn't staring at a blank screen
+        img_url = get_rotating_image()
+        st.image(img_url, use_column_width=True)
+        
+        # Stream the text live as it's being generated
+        st.write_stream(stream_affirmation_and_horoscope())
+        st.balloons()
+    except ResourceExhausted:
+        st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
 
 # Logic for Button 2 (Short 1-2 sentences)
 if quick_vibes:
-    with st.spinner("Catching a quick ray of sunshine..."):
-        try:
-            message = get_short_affirmation()
-            message = message.replace("\n", " ")
-            img_url = get_rotating_image()
-            
-            st.markdown(f"### 💛 {message}")
-            st.image(img_url, use_column_width=True)
-        except ResourceExhausted:
-            st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
+    try:
+        # Show the image instantly
+        img_url = get_rotating_image()
+        st.image(img_url, use_column_width=True)
+        
+        # Stream the text live as it's being generated
+        st.write_stream(stream_short_affirmation())
+    except ResourceExhausted:
+        st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
