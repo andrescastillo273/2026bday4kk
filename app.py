@@ -1,9 +1,10 @@
 import streamlit as st
 import google.generativeai as genai
 import random
+import requests
 
 # Page Configuration
-st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
+st.set_page_config(page_title="For Kate ❤️️", page_icon="✨", layout="centered")
 
 # Hide Streamlit's default menu and footer
 hide_st_style = """
@@ -89,7 +90,11 @@ def stream_short_affirmation():
         yield chunk.text.replace("\n", " ")
 
 def get_rotating_image():
-    images = [
+    themes = ['dog', 'cat', 'horse', 'beach', 'mountains', 'rainfall', 'forest cabin', 'ocean waves', 'national park']
+    query = random.choice(themes)
+    
+    # The fail-safe backup list just in case the API limit is hit
+    fallback_images = [
         "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=800&q=80", 
@@ -101,9 +106,34 @@ def get_rotating_image():
         "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=800&q=80", 
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", 
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=800&q=80"  
+        "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=800&q=80"
     ]
-    return random.choice(images)
+    
+    if "last_image" not in st.session_state:
+        st.session_state.last_image = None
+
+    try:
+        # Search the entire Unsplash library live
+        unsplash_url = f"https://api.unsplash.com/photos/random?query={query}&client_id={st.secrets['UNSPLASH_API_KEY']}"
+        response = requests.get(unsplash_url, timeout=3)
+        
+        if response.status_code == 200:
+            data = response.json()
+            new_image = data["urls"]["regular"]
+        else:
+            # If rate limit is hit, use the fallback list
+            new_image = random.choice(fallback_images)
+            while new_image == st.session_state.last_image:
+                new_image = random.choice(fallback_images)
+                
+    except Exception:
+        # If the network drops, use the fallback list
+        new_image = random.choice(fallback_images)
+        while new_image == st.session_state.last_image:
+            new_image = random.choice(fallback_images)
+
+    st.session_state.last_image = new_image
+    return new_image
 
 # --- UI Design ---
 st.title("✨ A Little Positivity for Kate ✨")
@@ -120,10 +150,8 @@ with col2:
 # Logic for Button 1 (Full message + Horoscope)
 if full_vibes:
     try:
-        # Stream the text completely first
         st.write_stream(stream_affirmation_and_horoscope())
         
-        # Load and display the image immediately after the text finishes
         img_url = get_rotating_image()
         st.image(img_url, use_column_width=True)
             
@@ -136,10 +164,8 @@ if full_vibes:
 # Logic for Button 2 (Short 1-2 sentences)
 if quick_vibes:
     try:
-        # Stream the text completely first
         st.write_stream(stream_short_affirmation())
         
-        # Load and display the image immediately after the text finishes
         img_url = get_rotating_image()
         st.image(img_url, use_column_width=True)
             
