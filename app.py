@@ -1,6 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
-import requests
+import random
 
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
@@ -18,7 +18,6 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 # Authenticate with Google AI Studio using Streamlit Secrets
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    # Using the auto-updating alias so it never breaks!
     model = genai.GenerativeModel('gemini-flash-latest')
 except KeyError:
     st.error("API Key not found. Please set GEMINI_API_KEY in Streamlit Secrets.")
@@ -57,13 +56,14 @@ def get_short_affirmation():
     response = model.generate_content(prompt)
     return response.text
 
-def get_cute_image():
-    # Using a free, keyless API that returns random cute dogs
-    try:
-        res = requests.get("https://dog.ceo/api/breeds/image/random")
-        return res.json()["message"]
-    except:
-        return "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+def get_rotating_image():
+    # Rotate between the requested themes
+    themes = ['dog', 'cat', 'horse', 'beach', 'mountains', 'rainfall']
+    choice = random.choice(themes)
+    
+    # We add a random number to the URL so the browser doesn't cache the previous image
+    cache_buster = random.randint(1, 10000)
+    return f"https://loremflickr.com/800/600/{choice}?random={cache_buster}"
 
 # --- UI Design ---
 st.title("✨ A Little Positivity for Kate ✨")
@@ -82,7 +82,7 @@ with col2:
 if full_vibes:
     with st.spinner("Gathering love, horoscopes, and good vibes..."):
         message = get_affirmation_and_horoscope()
-        img_url = get_cute_image()
+        img_url = get_rotating_image()
         
         st.markdown(message)
         st.image(img_url, use_column_width=True)
@@ -92,7 +92,10 @@ if full_vibes:
 if quick_vibes:
     with st.spinner("Catching a quick ray of sunshine..."):
         message = get_short_affirmation()
-        img_url = get_cute_image()
+        
+        # FIX FOR THE FONT ISSUE: Strip out AI line breaks so Markdown treats it all as one single header block
+        message = message.replace("\n", " ")
+        img_url = get_rotating_image()
         
         st.markdown(f"### 💛 {message}")
         st.image(img_url, use_column_width=True)
