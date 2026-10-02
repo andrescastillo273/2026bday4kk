@@ -5,7 +5,7 @@ import random
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
 
-# Hide Streamlit's default menu and footer for a cleaner look
+# Hide Streamlit's default menu and footer
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -15,30 +15,54 @@ hide_st_style = """
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-# Authenticate with Google AI Studio using Streamlit Secrets
+# Authenticate with Google AI Studio
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    model = genai.GenerativeModel('gemini-flash-latest')
+    model = genai.GenerativeModel(
+        'gemini-flash-latest',
+        generation_config=genai.types.GenerationConfig(temperature=0.9)
+    )
 except KeyError:
     st.error("API Key not found. Please set GEMINI_API_KEY in Streamlit Secrets.")
 
+def get_dynamic_elements():
+    traits = [
+        "her days playing college soccer",
+        "her demanding work as a USPTO attorney",
+        "her love for horses",
+        "her passion for cooking",
+        "her dedication to fitness",
+        "her love for museums and learning",
+        "her eye for decorating her apartment",
+        "her love for live concerts and friends",
+        "her fiercely loyal nature",
+        "her hopeless romantic heart"
+    ]
+    vibes = [
+        "deeply romantic and comforting",
+        "fiercely empowering (major hype-energy)",
+        "gentle, cozy, and soothing to help her ADHD/anxiety",
+        "incredibly proud and validating of her hard work",
+        "lighthearted, playful, and uplifting"
+    ]
+    return random.sample(traits, 2), random.choice(vibes)
+
 def stream_affirmation_and_horoscope():
-    prompt = """
-    Write a short, unique, and highly personalized positive affirmation for my girlfriend, Kate. 
-    She is 26, a USPTO attorney, a former college soccer player, a hopeless romantic, a left-leaning Republican, and fiercely loyal. 
-    She loves horses, cooking, fitness, museums, decorating her apartment, and concerts. 
-    She also manages ADHD, anxiety, debt, and a close but difficult relationship with her family.
-
-    Instructions:
-    1. Validate how hard she works and how much she is loved.
-    2. Pick just 1 or 2 of her interests or traits to weave into the message naturally (don't list them all, keep it fresh each time).
-    3. Provide a sweet, empowering affirmation to soothe her anxiety and ADHD.
-    4. Provide a short, ultra-positive daily horoscope for a Libra (born Oct 4).
-    5. Keep the tone warm, loving, encouraging, and authentic.
-
+    selected_traits, vibe = get_dynamic_elements()
+    
+    prompt = f"""
+    Write a short, totally unique positive affirmation for my girlfriend, Kate. 
+    She is 26 (born Oct 4) and manages anxiety, ADHD, debt, and tricky family dynamics.
+    
+    CRITICAL INSTRUCTIONS TO MAKE THIS UNIQUE:
+    1. Write this in a {vibe} tone.
+    2. ONLY mention these two things about her: {selected_traits[0]} and {selected_traits[1]}. Do not list any of her other hobbies.
+    3. Remind her she is totally capable and deeply loved.
+    4. Provide a short, ultra-positive daily horoscope for a Libra.
+    
     Format exactly like this in Markdown:
     ### ✨ Just For You, Kate
-    [Your affirmation here]
+    [Your dynamic affirmation here]
 
     ### ♎ Today's Libra Horoscope
     [Your horoscope here]
@@ -48,11 +72,16 @@ def stream_affirmation_and_horoscope():
         yield chunk.text
 
 def stream_short_affirmation():
-    prompt = """
-    Write a very short, punchy 1 to 2 sentence maximum positive affirmation for my girlfriend, Kate. 
-    She is an incredibly hardworking 26-year-old USPTO attorney who manages anxiety and ADHD. 
-    Make it a quick, empowering pick-me-up that reminds her she is deeply loved and totally capable.
-    Do not include a horoscope or any extra text. Do not use line breaks.
+    selected_traits, vibe = get_dynamic_elements()
+    
+    prompt = f"""
+    Write a completely unique, 1 to 2 sentence positive affirmation for my girlfriend, Kate. 
+    She is a 26-year-old USPTO attorney who manages anxiety and ADHD.
+    
+    CRITICAL INSTRUCTIONS:
+    1. Write this in a {vibe} tone.
+    2. Briefly weave in a reference to {selected_traits[0]}.
+    3. Make it a quick, empowering pick-me-up. Do not include a horoscope. Do not use line breaks.
     """
     response = model.generate_content(prompt, stream=True)
     yield "### 💛 " 
@@ -60,7 +89,6 @@ def stream_short_affirmation():
         yield chunk.text.replace("\n", " ")
 
 def get_rotating_image():
-    # A curated, fail-proof list of high-quality Unsplash images
     images = [
         "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80",
@@ -92,20 +120,14 @@ with col2:
 # Logic for Button 1 (Full message + Horoscope)
 if full_vibes:
     try:
-        # Create invisible containers to lock in the layout order
-        text_container = st.container()
-        image_container = st.container()
+        # Stream the text completely first
+        st.write_stream(stream_affirmation_and_horoscope())
         
-        # Load the image instantly into the BOTTOM container
+        # Load and display the image immediately after the text finishes
         img_url = get_rotating_image()
-        image_container.image(img_url, use_column_width=True)
-        
-        # Stream the text into the TOP container
-        with text_container:
-            st.write_stream(stream_affirmation_and_horoscope())
+        st.image(img_url, use_column_width=True)
             
     except Exception as e:
-        # Catch-all for ANY error during the streaming process
         if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
             st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
         else:
@@ -114,20 +136,14 @@ if full_vibes:
 # Logic for Button 2 (Short 1-2 sentences)
 if quick_vibes:
     try:
-        # Create invisible containers to lock in the layout order
-        text_container = st.container()
-        image_container = st.container()
+        # Stream the text completely first
+        st.write_stream(stream_short_affirmation())
         
-        # Load the image instantly into the BOTTOM container
+        # Load and display the image immediately after the text finishes
         img_url = get_rotating_image()
-        image_container.image(img_url, use_column_width=True)
-        
-        # Stream the text into the TOP container
-        with text_container:
-            st.write_stream(stream_short_affirmation())
+        st.image(img_url, use_column_width=True)
             
     except Exception as e:
-        # Catch-all for ANY error during the streaming process
         if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
             st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
         else:
