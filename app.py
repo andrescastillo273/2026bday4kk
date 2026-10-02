@@ -1,7 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
 import random
-from google.api_core.exceptions import ResourceExhausted
 
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
@@ -44,7 +43,6 @@ def stream_affirmation_and_horoscope():
     ### ♎ Today's Libra Horoscope
     [Your horoscope here]
     """
-    # stream=True tells Google to send the words as they are being typed
     response = model.generate_content(prompt, stream=True)
     for chunk in response:
         yield chunk.text
@@ -56,13 +54,9 @@ def stream_short_affirmation():
     Make it a quick, empowering pick-me-up that reminds her she is deeply loved and totally capable.
     Do not include a horoscope or any extra text. Do not use line breaks.
     """
-    # stream=True tells Google to send the words as they are being typed
     response = model.generate_content(prompt, stream=True)
-    
-    # We yield the Markdown header formatting first so the font stays large
     yield "### 💛 " 
     for chunk in response:
-        # Strip out any sneaky line breaks as they arrive to protect the font size
         yield chunk.text.replace("\n", " ")
 
 def get_rotating_image():
@@ -98,24 +92,28 @@ with col2:
 # Logic for Button 1 (Full message + Horoscope)
 if full_vibes:
     try:
-        # Show the image instantly so she isn't staring at a blank screen
         img_url = get_rotating_image()
         st.image(img_url, use_column_width=True)
         
-        # Stream the text live as it's being generated
         st.write_stream(stream_affirmation_and_horoscope())
         st.balloons()
-    except ResourceExhausted:
-        st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
+    except Exception as e:
+        # Catch-all for ANY error during the streaming process
+        if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
+            st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
+        else:
+            st.warning("✨ The cosmic connection stuttered for a second. Try pushing the button again!")
 
 # Logic for Button 2 (Short 1-2 sentences)
 if quick_vibes:
     try:
-        # Show the image instantly
         img_url = get_rotating_image()
         st.image(img_url, use_column_width=True)
         
-        # Stream the text live as it's being generated
         st.write_stream(stream_short_affirmation())
-    except ResourceExhausted:
-        st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
+    except Exception as e:
+        # Catch-all for ANY error during the streaming process
+        if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
+            st.warning("💛 Whoa there! The universe is gathering vibes as fast as it can. Take a deep breath and try the button again in about a minute.")
+        else:
+            st.warning("✨ The cosmic connection stuttered for a second. Try pushing the button again!")
