@@ -6,88 +6,8 @@ import requests
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
 
-# UI Styling & iPhone Web Clip Icon with forced high-contrast colors (Dark Mode resistant)
-custom_head = """
-<link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=180&h=180&q=80">
-<style>
-#MainMenu {visibility: hidden;} 
-footer {visibility: hidden;} 
-header {visibility: hidden;} 
-
-/* Force light warm background everywhere */
-.stApp {
-    background-color: #FAF7F2 !important;
-    color: #2C3E50 !important;
-}
-
-/* Hero card styling */
-.hero-card {
-    background-color: #FFFFFF !important;
-    padding: 30px 15px !important;
-    border-radius: 20px !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
-    text-align: center !important;
-    margin-bottom: 25px !important;
-    border: 1px solid #EFECE6 !important;
-}
-
-/* Force dark header text regardless of phone dark mode */
-.main-title {
-    font-family: 'Helvetica Neue', sans-serif !important;
-    color: #2C3E50 !important;
-    font-weight: 700 !important;
-    font-size: clamp(1.2rem, 5.5vw, 2.1rem) !important;
-    white-space: nowrap !important;
-    margin-bottom: 12px !important;
-    line-height: 1.2 !important;
-}
-
-/* Subtitle styling */
-.sub-text {
-    color: #555555 !important;
-    font-size: 0.95rem !important;
-    line-height: 1.4 !important;
-    margin-bottom: 0px !important;
-}
-
-/* Style secondary buttons to look clean and legible in both light & dark mode */
-.stButton>button {
-    border-radius: 14px !important;
-    font-weight: 600 !important;
-    height: 50px !important;
-    border: 1px solid #E2D9CE !important;
-    background-color: #FFFFFF !important;
-    color: #2C3E50 !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02) !important;
-    transition: all 0.2s ease-in-out !important;
-}
-
-/* Maintain proper styling on primary button */
-.stButton>button[kind="primary"] {
-    background-color: #FF4B4B !important;
-    color: #FFFFFF !important;
-    border: none !important;
-}
-
-.stButton>button:hover {
-    border-color: #D4AF37 !important;
-    color: #D4AF37 !important;
-}
-
-/* Card container for results */
-[data-testid="stVerticalBlockBorderWrapper"] {
-    background-color: #FFFFFF !important;
-    border-radius: 18px !important;
-    border: 1px solid #EFECE6 !important;
-    color: #2C3E50 !important;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"] * {
-    color: #2C3E50 !important;
-}
-</style>
-"""
-st.markdown(custom_head, unsafe_allow_html=True)
+# Native HTML/CSS injection with Dark Mode overrides and Apple Touch Icon
+st.html("""<link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=180&h=180&q=80"><style>#MainMenu,footer,header{visibility:hidden;}.stApp{background-color:#FAF7F2!important;color:#2C3E50!important;}.hero-card{background-color:#FFFFFF!important;padding:30px 15px!important;border-radius:20px!important;box-shadow:0 4px 20px rgba(0,0,0,0.05)!important;text-align:center!important;margin-bottom:25px!important;border:1px solid #EFECE6!important;}.main-title{font-family:'Helvetica Neue',sans-serif!important;color:#2C3E50!important;font-weight:700!important;font-size:clamp(1.2rem,5.5vw,2.1rem)!important;white-space:nowrap!important;margin-bottom:12px!important;line-height:1.2!important;}.sub-text{color:#555555!important;font-size:0.95rem!important;line-height:1.4!important;margin-bottom:0px!important;}.stButton>button{border-radius:14px!important;font-weight:600!important;height:50px!important;border:1px solid #E2D9CE!important;background-color:#FFFFFF!important;color:#2C3E50!important;box-shadow:0 2px 5px rgba(0,0,0,0.02)!important;transition:all 0.2s ease-in-out!important;}.stButton>button[kind="primary"]{background-color:#FF4B4B!important;color:#FFFFFF!important;border:none!important;}.stButton>button:hover{border-color:#D4AF37!important;color:#D4AF37!important;}[data-testid="stVerticalBlockBorderWrapper"]{background-color:#FFFFFF!important;border-radius:18px!important;border:1px solid #EFECE6!important;color:#2C3E50!important;}[data-testid="stVerticalBlockBorderWrapper"] *{color:#2C3E50!important;}</style>""")
 
 # Authenticate with Google AI Studio
 try:
@@ -204,13 +124,8 @@ def get_rotating_image():
     st.session_state.last_image = new_image
     return new_image
 
-# --- UI Design: Framed Hero Card ---
-st.markdown("""
-    <div class="hero-card">
-        <h1 class="main-title">✨ A Little Positivity for Kate ✨</h1>
-        <p class="sub-text">Whenever things feel heavy, or you just need a reminder of how amazing you are, push a button.</p>
-    </div>
-""", unsafe_allow_html=True)
+# Hero Card
+st.html("""<div class="hero-card"><h1 class="main-title">✨ A Little Positivity for Kate ✨</h1><p class="sub-text">Whenever things feel heavy, or you just need a reminder of how amazing you are, push a button.</p></div>""")
 
 col1, col2 = st.columns(2)
 
