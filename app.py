@@ -6,67 +6,9 @@ import requests
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
 
-# Hide Streamlit default header/footer elements
-st.markdown("""
-    <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
-
-# Custom CSS for boutique aesthetic, apple touch icon, and responsive single-line title
-st.markdown("""
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=180&h=180&q=80">
-    <style>
-    /* Soft warm background */
-    .stApp {
-        background-color: #FAF7F2;
-    }
-    
-    /* Main card wrapper for the hero section */
-    .hero-card {
-        background-color: #FFFFFF;
-        padding: 35px 20px;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        text-align: center;
-        margin-bottom: 25px;
-        border: 1px solid #EFECE6;
-    }
-    
-    /* Fluid font size + forced nowrap ensures single-line display across devices */
-    .main-title {
-        font-family: 'Helvetica Neue', sans-serif;
-        color: #2C3E50;
-        font-weight: 700;
-        font-size: clamp(1.3rem, 4.2vw, 2.1rem);
-        white-space: nowrap;
-        margin-bottom: 10px;
-    }
-    
-    .sub-text {
-        color: #666666;
-        font-size: 1rem;
-        margin-bottom: 25px;
-    }
-
-    /* Style buttons for a smooth, modern aesthetic */
-    .stButton>button {
-        border-radius: 14px;
-        font-weight: 600;
-        height: 50px;
-        border: 1px solid #E2D9CE;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        transition: all 0.2s ease-in-out;
-    }
-    
-    .stButton>button:hover {
-        border-color: #D4AF37;
-        color: #D4AF37;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# UI Styling & iPhone Web Clip Icon injected cleanly without Markdown parsing artifacts
+custom_head = """<link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=180&h=180&q=80"><style>#MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;} .stApp {background-color: #FAF7F2;} .hero-card {background-color: #FFFFFF; padding: 35px 20px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); text-align: center; margin-bottom: 25px; border: 1px solid #EFECE6;} .main-title {font-family: 'Helvetica Neue', sans-serif; color: #2C3E50; font-weight: 700; font-size: clamp(1.2rem, 4vw, 2.1rem); white-space: nowrap; margin-bottom: 10px;} .sub-text {color: #666666; font-size: 1rem; margin-bottom: 25px;} .stButton>button {border-radius: 14px; font-weight: 600; height: 50px; border: 1px solid #E2D9CE; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: all 0.2s ease-in-out;} .stButton>button:hover {border-color: #D4AF37; color: #D4AF37;}</style>"""
+st.markdown(custom_head, unsafe_allow_html=True)
 
 # Authenticate with Google AI Studio
 try:
@@ -183,7 +125,7 @@ def get_rotating_image():
     st.session_state.last_image = new_image
     return new_image
 
-# --- UI Design: Hero Card ---
+# --- UI Design: Framed Hero Card ---
 st.markdown("""
     <div class="hero-card">
         <h1 class="main-title">✨ A Little Positivity for Kate ✨</h1>
