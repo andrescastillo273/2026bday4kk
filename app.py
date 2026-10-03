@@ -6,7 +6,7 @@ import requests
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
 
-# Custom CSS for a stunning, boutique aesthetic
+# Custom CSS for boutique aesthetic and responsive single-line title
 st.markdown("""
     <style>
     /* Soft warm background */
@@ -17,7 +17,7 @@ st.markdown("""
     /* Main card wrapper for the header */
     .hero-card {
         background-color: #FFFFFF;
-        padding: 40px 30px;
+        padding: 35px 20px;
         border-radius: 20px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         text-align: center;
@@ -25,18 +25,20 @@ st.markdown("""
         border: 1px solid #EFECE6;
     }
     
+    /* Fluid font size + forced nowrap ensures it stays strictly on one line everywhere */
     .main-title {
         font-family: 'Helvetica Neue', sans-serif;
         color: #2C3E50;
         font-weight: 700;
-        font-size: 2.2rem;
+        font-size: clamp(1.3rem, 4.2vw, 2.1rem);
+        white-space: nowrap;
         margin-bottom: 10px;
     }
     
     .sub-text {
         color: #666666;
-        font-size: 1.05rem;
-        margin-bottom: 30px;
+        font-size: 1rem;
+        margin-bottom: 25px;
     }
 
     /* Style buttons for a smoother, modern look */
