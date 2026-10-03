@@ -6,7 +6,16 @@ import requests
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
 
-# Custom CSS for boutique aesthetic and responsive single-line title
+# Hide Streamlit default header/footer elements
+st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
+
+# Custom CSS for boutique aesthetic, apple touch icon, and responsive single-line title
 st.markdown("""
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=180&h=180&q=80">
     <style>
@@ -15,7 +24,7 @@ st.markdown("""
         background-color: #FAF7F2;
     }
     
-    /* Main card wrapper for the header */
+    /* Main card wrapper for the hero section */
     .hero-card {
         background-color: #FFFFFF;
         padding: 35px 20px;
@@ -26,7 +35,7 @@ st.markdown("""
         border: 1px solid #EFECE6;
     }
     
-    /* Fluid font size + forced nowrap ensures it stays strictly on one line everywhere */
+    /* Fluid font size + forced nowrap ensures single-line display across devices */
     .main-title {
         font-family: 'Helvetica Neue', sans-serif;
         color: #2C3E50;
@@ -42,7 +51,7 @@ st.markdown("""
         margin-bottom: 25px;
     }
 
-    /* Style buttons for a smoother, modern look */
+    /* Style buttons for a smooth, modern aesthetic */
     .stButton>button {
         border-radius: 14px;
         font-weight: 600;
@@ -174,7 +183,7 @@ def get_rotating_image():
     st.session_state.last_image = new_image
     return new_image
 
-# --- UI Design: Framed Hero Card ---
+# --- UI Design: Hero Card ---
 st.markdown("""
     <div class="hero-card">
         <h1 class="main-title">✨ A Little Positivity for Kate ✨</h1>
@@ -190,7 +199,7 @@ with col1:
 with col2:
     quick_vibes = st.button("Quick Dose of Sunshine ☀️", use_container_width=True)
 
-# Logic for Button 1
+# Logic for Button 1 (Full Affirmation + Horoscope, then Image)
 if full_vibes:
     try:
         with st.container(border=True):
@@ -204,7 +213,7 @@ if full_vibes:
         else:
             st.warning("✨ The cosmic connection stuttered for a second. Try pushing the button again!")
 
-# Logic for Button 2
+# Logic for Button 2 (Short Affirmation, then Image)
 if quick_vibes:
     try:
         with st.container(border=True):
