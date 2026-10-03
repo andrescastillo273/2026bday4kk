@@ -6,7 +6,7 @@ import requests
 # Page Configuration
 st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
 
-# Custom CSS to make the app pop with warm colors and modern styling
+# Custom CSS for a stunning, boutique aesthetic
 st.markdown("""
     <style>
     /* Soft warm background */
@@ -14,25 +14,36 @@ st.markdown("""
         background-color: #FAF7F2;
     }
     
-    /* Center the main title header */
-    .main-title {
+    /* Main card wrapper for the header */
+    .hero-card {
+        background-color: #FFFFFF;
+        padding: 40px 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         text-align: center;
+        margin-bottom: 25px;
+        border: 1px solid #EFECE6;
+    }
+    
+    .main-title {
         font-family: 'Helvetica Neue', sans-serif;
         color: #2C3E50;
         font-weight: 700;
-        padding-top: 10px;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
     }
     
     .sub-text {
-        text-align: center;
-        color: #555555;
-        margin-bottom: 25px;
+        color: #666666;
+        font-size: 1.05rem;
+        margin-bottom: 30px;
     }
 
-    /* Style buttons for a smoother look */
+    /* Style buttons for a smoother, modern look */
     .stButton>button {
-        border-radius: 16px;
+        border-radius: 14px;
         font-weight: 600;
+        height: 50px;
         border: 1px solid #E2D9CE;
         box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         transition: all 0.2s ease-in-out;
@@ -160,9 +171,13 @@ def get_rotating_image():
     st.session_state.last_image = new_image
     return new_image
 
-# --- UI Design ---
-st.markdown("<h1 class='main-title'>✨ A Little Positivity for Kate ✨</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-text'>Whenever things feel heavy, or you just need a reminder of how amazing you are, push a button.</p>", unsafe_allow_html=True)
+# --- UI Design: Framed Hero Card ---
+st.markdown("""
+    <div class="hero-card">
+        <h1 class="main-title">✨ A Little Positivity for Kate ✨</h1>
+        <p class="sub-text">Whenever things feel heavy, or you just need a reminder of how amazing you are, push a button.</p>
+    </div>
+""", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -172,7 +187,7 @@ with col1:
 with col2:
     quick_vibes = st.button("Quick Dose of Sunshine ☀️", use_container_width=True)
 
-# Logic for Button 1 (Full message + Horoscope inside a gorgeous card container)
+# Logic for Button 1
 if full_vibes:
     try:
         with st.container(border=True):
@@ -186,7 +201,7 @@ if full_vibes:
         else:
             st.warning("✨ The cosmic connection stuttered for a second. Try pushing the button again!")
 
-# Logic for Button 2 (Short message inside a gorgeous card container)
+# Logic for Button 2
 if quick_vibes:
     try:
         with st.container(border=True):
