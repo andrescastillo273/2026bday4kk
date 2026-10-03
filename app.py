@@ -4,17 +4,46 @@ import random
 import requests
 
 # Page Configuration
-st.set_page_config(page_title="For Kate ❤️️", page_icon="✨", layout="centered")
+st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="centered")
 
-# Hide Streamlit's default menu and footer
-hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_st_style, unsafe_allow_html=True)
+# Custom CSS to make the app pop with warm colors and modern styling
+st.markdown("""
+    <style>
+    /* Soft warm background */
+    .stApp {
+        background-color: #FAF7F2;
+    }
+    
+    /* Center the main title header */
+    .main-title {
+        text-align: center;
+        font-family: 'Helvetica Neue', sans-serif;
+        color: #2C3E50;
+        font-weight: 700;
+        padding-top: 10px;
+    }
+    
+    .sub-text {
+        text-align: center;
+        color: #555555;
+        margin-bottom: 25px;
+    }
+
+    /* Style buttons for a smoother look */
+    .stButton>button {
+        border-radius: 16px;
+        font-weight: 600;
+        border: 1px solid #E2D9CE;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .stButton>button:hover {
+        border-color: #D4AF37;
+        color: #D4AF37;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Authenticate with Google AI Studio
 try:
@@ -93,7 +122,6 @@ def get_rotating_image():
     themes = ['dog', 'cat', 'horse', 'beach', 'mountains', 'rainfall', 'forest cabin', 'ocean waves', 'national park']
     query = random.choice(themes)
     
-    # The fail-safe backup list just in case the API limit is hit
     fallback_images = [
         "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80",
@@ -113,7 +141,6 @@ def get_rotating_image():
         st.session_state.last_image = None
 
     try:
-        # Search the entire Unsplash library live
         unsplash_url = f"https://api.unsplash.com/photos/random?query={query}&client_id={st.secrets['UNSPLASH_API_KEY']}"
         response = requests.get(unsplash_url, timeout=3)
         
@@ -121,13 +148,11 @@ def get_rotating_image():
             data = response.json()
             new_image = data["urls"]["regular"]
         else:
-            # If rate limit is hit, use the fallback list
             new_image = random.choice(fallback_images)
             while new_image == st.session_state.last_image:
                 new_image = random.choice(fallback_images)
                 
     except Exception:
-        # If the network drops, use the fallback list
         new_image = random.choice(fallback_images)
         while new_image == st.session_state.last_image:
             new_image = random.choice(fallback_images)
@@ -136,8 +161,8 @@ def get_rotating_image():
     return new_image
 
 # --- UI Design ---
-st.title("✨ A Little Positivity for Kate ✨")
-st.write("Whenever things feel heavy, or you just need a reminder of how amazing you are, push a button.")
+st.markdown("<h1 class='main-title'>✨ A Little Positivity for Kate ✨</h1>", unsafe_allow_html=True)
+st.markdown("<p class='sub-text'>Whenever things feel heavy, or you just need a reminder of how amazing you are, push a button.</p>", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -147,13 +172,13 @@ with col1:
 with col2:
     quick_vibes = st.button("Quick Dose of Sunshine ☀️", use_container_width=True)
 
-# Logic for Button 1 (Full message + Horoscope)
+# Logic for Button 1 (Full message + Horoscope inside a gorgeous card container)
 if full_vibes:
     try:
-        st.write_stream(stream_affirmation_and_horoscope())
-        
-        img_url = get_rotating_image()
-        st.image(img_url, use_column_width=True)
+        with st.container(border=True):
+            st.write_stream(stream_affirmation_and_horoscope())
+            img_url = get_rotating_image()
+            st.image(img_url, use_column_width=True)
             
     except Exception as e:
         if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
@@ -161,13 +186,13 @@ if full_vibes:
         else:
             st.warning("✨ The cosmic connection stuttered for a second. Try pushing the button again!")
 
-# Logic for Button 2 (Short 1-2 sentences)
+# Logic for Button 2 (Short message inside a gorgeous card container)
 if quick_vibes:
     try:
-        st.write_stream(stream_short_affirmation())
-        
-        img_url = get_rotating_image()
-        st.image(img_url, use_column_width=True)
+        with st.container(border=True):
+            st.write_stream(stream_short_affirmation())
+            img_url = get_rotating_image()
+            st.image(img_url, use_column_width=True)
             
     except Exception as e:
         if "429" in str(e) or "Quota" in str(e) or "ResourceExhausted" in str(e):
