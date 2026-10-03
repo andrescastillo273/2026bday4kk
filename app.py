@@ -8,6 +8,7 @@ st.set_page_config(page_title="For Kate ❤️", page_icon="✨", layout="center
 
 # Custom CSS for boutique aesthetic and responsive single-line title
 st.markdown("""
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=180&h=180&q=80">
     <style>
     /* Soft warm background */
     .stApp {
